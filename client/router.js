@@ -344,8 +344,21 @@ Router.prototype._notfoundRoute = function(context) {
   // XXX this.notfound kept for backwards compatibility
   this.notFound = this.notFound || this.notfound;
   if(!this.notFound) {
-    console.error("There is no route for the path:", context.path);
+    // ==============================================
+    // BUGFIX (this is the ONLY thing this fork does)
+    // ==============================================
+    // Make this work with mocha-unit-tests `practicalmeteor:mocha`
+    // see https://forums.meteor.com/t/spacejam-phantomjs-no-route-for-the-path-local-flowrouter/25233/12
+    if (!Meteor.isTest && !Meteor.isAppTest && !Meteor.isPackageTest) {
+      console.error("There is no route for the path:", context.path);
+    } else {
+      console.log("There is no route for the path:", context.path);
+      if (window.console && window.console.trace) {
+        console.trace();
+      }
+    }
     return;
+    // ==============================================
   }
 
   this._current.route = new Route(this, "*", this.notFound);
